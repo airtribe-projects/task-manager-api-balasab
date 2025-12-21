@@ -1,32 +1,12 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 const taskFilePath = path.join(__dirname, '../task.json');
 
-// Helper to read tasks
-const readTasks = () => {
-    console.log("Start reading");
-    // macrotask queue
-    setImmediate(() => {
-        console.log("This runs after I/O callbacks");
-    });
-
-    // macrotask queue
-    setTimeout(() => {
-        console.log("This runs after timer expires (min 1ms)");
-    }, 0);
-    
-    // microtask queue
-    process.nextTick(() => {
-        console.log("This runs BEFORE the event loop continues!");
-    });
-    
-    // await Promise.resolve().then(() => {
-    //     console.log("This runs in microtask queue via Promise!");
-    // });
+// Helper to read tasks (async)
+const readTasks = async () => {
     try {
-        // queueing I/O operation
-        const data = fs.readFileSync(taskFilePath, 'utf8');
+        const data = await fs.readFile(taskFilePath, 'utf8');
         return JSON.parse(data);
     } catch (err) {
         console.error('Error reading task file:', err);
@@ -34,10 +14,10 @@ const readTasks = () => {
     }
 };
 
-// Helper to write tasks
-const writeTasks = (data) => {
+// Helper to write tasks (async)
+const writeTasks = async (data) => {
     try {
-        fs.writeFileSync(taskFilePath, JSON.stringify(data, null, 2));
+        await fs.writeFile(taskFilePath, JSON.stringify(data, null, 2));
     } catch (err) {
         console.error('Error writing to task file:', err);
     }
